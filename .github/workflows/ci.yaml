@@ -38,11 +38,14 @@ jobs:
         - name: checkout code
           uses: actions/checkout@v4
         
+        - name: Install golangci-lint
+          run: curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.55.2
+
         
         - name: Run golangci-lint
           run: |
-                go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
-                golangci-lint run src/product-catalog/...
+            cd src/product-catalog
+            $(go env GOPATH)/bin/golangci-lint run --timeout 5m 
 
     docker:
         runs-on: ubuntu-latest
