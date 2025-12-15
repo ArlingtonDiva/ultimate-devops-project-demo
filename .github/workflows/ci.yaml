@@ -43,7 +43,7 @@ jobs:
 
         
         - name: Run golangci-lint
-          run: $(go env GOPATH)/bin/golangci-lint run src/product-catalog/...
+          run: $(go env GOPATH)/bin/golangci-lint run -v
 
     docker:
         runs-on: ubuntu-latest
