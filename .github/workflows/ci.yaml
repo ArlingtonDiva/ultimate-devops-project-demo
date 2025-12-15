@@ -38,17 +38,21 @@ jobs:
         - name: checkout code
           uses: actions/checkout@v4
         
-        - name: Setup Go 1.22
-          uses: actions/setup-go@v2
-          with:
-           go-version: 1.22
-        
+        - name: Setup Go 1.22 
+          uses: actions/setup-go@v2 
+          with: 
+            go-version: 1.22
+
+        - name: Install golangci-lint 
+          run: curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.55.2 
+
+        - name: Prepare module dependencies
+          working-directory: src/product-catalog
+          run: go mod download
+
         - name: Run golangci-lint
-          uses: golangci/golangci-lint-action@v6
-          with:
-            version: v1.55.2
-            run: golangci-lint run
-            working-directory: src/product-catalog
+          working-directory: src/product-catalog
+          run: golangci-lint run ./...
 
     docker:
         runs-on: ubuntu-latest
@@ -90,12 +94,12 @@ jobs:
 
         - name: Update tag in kubernetes deployment manifest
           run: | 
-               sed -i "s|image: .*|image: ${{ secrets.DOCKER_USERNAME }}/product-catalog:${{github.run_id}}|" kubernetes/productcatalog/deploy.yaml
+               sed -i "s|image: .*|image: ${{ secrets.DOCKER_USERNAME }} product-catalog:${{github.run_id}}|g" kubernetes/productcatalog/deploy.yaml
         
         - name: Commit and push changes
           run: |
-            git config --global user.email "abhishek@gmail.com"
-            git config --global user.name "Abhishek Veeramalla"
+            git config --global user.email "talktoalisha@gmail.com"
+            git config --global user.name "Alisha Thompson"
             git add kubernetes/productcatalog/deploy.yaml
             git commit -m "[CI]: Update product catalog image tag"
             git push origin HEAD:main -f
